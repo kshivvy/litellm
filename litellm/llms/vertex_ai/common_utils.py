@@ -117,15 +117,28 @@ def _get_gemini_url(
     stream: Optional[bool],
     gemini_api_key: Optional[str],
 ) -> Tuple[str, str]:
-    _gemini_model_name = "models/{}".format(model)
+    _dynamic_model = None
+    if model.startswith("dynamic"):
+        _dynamic_model = model
+        # This can be anything.
+        _gemini_model_name = "models/gemini-1.5-flash-002"
+    else:
+        _gemini_model_name = "models/{}".format(model)
+
     if mode == "chat":
         endpoint = "generateContent"
         if stream is True:
             endpoint = "streamGenerateContent"
-            url = "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}&alt=sse".format(
-                _gemini_model_name, endpoint, gemini_api_key
-            )
+            if _dynamic_model:
+                url = "https://autopush-generativelanguage.sandbox.googleapis.com/v1beta/{}:{}?key={}&model={}&alt=sse".format(
+                    _gemini_model_name, endpoint, gemini_api_key, _dynamic_model
+                )
+            else:
+                url = "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}&alt=sse".format(
+                    _gemini_model_name, endpoint, gemini_api_key
+                )
         else:
+
             url = (
                 "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}".format(
                     _gemini_model_name, endpoint, gemini_api_key
