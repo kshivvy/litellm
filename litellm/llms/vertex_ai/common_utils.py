@@ -119,7 +119,7 @@ def _get_gemini_url(
 ) -> Tuple[str, str]:
     _dynamic_model = None
     if model.startswith("gemini/dynamic"):
-        _dynamic_model = model.removeprefix("gemini")
+        _dynamic_model = model.removeprefix("gemini/")
         # This can be anything.
         _gemini_model_name = "models/gemini-1.5-flash-002"
     else:
