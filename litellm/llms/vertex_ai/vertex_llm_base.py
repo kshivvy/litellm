@@ -126,8 +126,8 @@ class VertexBase(BaseLLM):
         """
         Returns auth token and project id
         """
-        if custom_llm_provider == "gemini":
-            return "", ""
+        # if custom_llm_provider == "gemini":
+        #     return "", ""
         if self.access_token is not None:
             if project_id is not None:
                 return self.access_token, project_id
@@ -153,7 +153,7 @@ class VertexBase(BaseLLM):
         if not self._credentials or not self._credentials.token:
             raise RuntimeError("Could not resolve API token from the environment")
 
-        return self._credentials.token, project_id or self.project_id
+        return self._credentials.id_token, project_id or self.project_id
 
     def is_using_v1beta1_features(self, optional_params: dict) -> bool:
         """
@@ -232,7 +232,7 @@ class VertexBase(BaseLLM):
                 stream=stream,
                 gemini_api_key=gemini_api_key,
             )
-            auth_header = None  # this field is not used for gemin
+            # auth_header = None  # this field is not used for gemin
         else:
             vertex_location = self.get_vertex_region(vertex_region=vertex_location)
 
