@@ -1261,6 +1261,7 @@ class VertexLLM(VertexBase):
             credentials=vertex_credentials,
             project_id=vertex_project,
             custom_llm_provider=custom_llm_provider,
+            api_base=api_base,
         )
 
         auth_header, url = self._get_token_and_url(
