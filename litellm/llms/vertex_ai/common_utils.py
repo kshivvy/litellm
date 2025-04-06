@@ -116,6 +116,7 @@ def _get_gemini_url(
     model: str,
     stream: Optional[bool],
     gemini_api_key: Optional[str],
+    api_base: Optional[str] = None,
 ) -> Tuple[str, str]:
     _dynamic_model = None
     if model.startswith("dynamic"):
@@ -124,35 +125,36 @@ def _get_gemini_url(
         _gemini_model_name = "models/gemini-1.5-flash-002"
     else:
         _gemini_model_name = "models/{}".format(model)
+    _api_base = api_base or "https://generativelanguage.googleapis.com"
 
     if mode == "chat":
         endpoint = "generateContent"
         if stream is True:
             endpoint = "streamGenerateContent"
             if _dynamic_model:
-                url = "https://autopush-generativelanguage.sandbox.googleapis.com/v1beta/{}:{}?key={}&model={}&alt=sse".format(
-                    _gemini_model_name, endpoint, gemini_api_key, _dynamic_model
+                url = "{}/v1beta/{}:{}?key={}&model={}&alt=sse".format(
+                    _api_base, _gemini_model_name, endpoint, gemini_api_key, _dynamic_model
                 )
             else:
-                url = "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}&alt=sse".format(
-                    _gemini_model_name, endpoint, gemini_api_key
+                url = "{}/v1beta/{}:{}?key={}&alt=sse".format(
+                    _api_base, _gemini_model_name, endpoint, gemini_api_key
                 )
         else:
 
             url = (
-                "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}".format(
-                    _gemini_model_name, endpoint, gemini_api_key
+                "{}/v1beta/{}:{}?key={}".format(
+                   _api_base, _gemini_model_name, endpoint, gemini_api_key
                 )
             )
     elif mode == "embedding":
         endpoint = "embedContent"
-        url = "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}".format(
-            _gemini_model_name, endpoint, gemini_api_key
+        url = "{}/v1beta/{}:{}?key={}".format(
+            _api_base, _gemini_model_name, endpoint, gemini_api_key
         )
     elif mode == "batch_embedding":
         endpoint = "batchEmbedContents"
-        url = "https://generativelanguage.googleapis.com/v1beta/{}:{}?key={}".format(
-            _gemini_model_name, endpoint, gemini_api_key
+        url = "{}/v1beta/{}:{}?key={}".format(
+            _api_base, _gemini_model_name, endpoint, gemini_api_key
         )
     elif mode == "image_generation":
         raise ValueError(
