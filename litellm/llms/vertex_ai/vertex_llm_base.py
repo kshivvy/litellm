@@ -115,15 +115,15 @@ class VertexBase(BaseLLM):
 
         credentials.refresh(Request())
 
-    def _get_id_token(self, audience):
-        """Get an ID token if running as service account."""
-        from google.auth.transport.requests import AuthorizedSession, Request
-        from google.oauth2.id_token import fetch_id_token
-        assert self._credentials is not None
-        session = AuthorizedSession(self._credentials)
-        request = Request(session)
-        self._credentials.refresh(request)
-        return fetch_id_token(request, audience)
+    # def _get_id_token(self, audience):
+    #     """Get an ID token if running as service account."""
+    #     from google.auth.transport.requests import AuthorizedSession, Request
+    #     from google.oauth2.id_token import fetch_id_token
+    #     assert self._credentials is not None
+    #     session = AuthorizedSession(self._credentials)
+    #     request = Request(session)
+    #     self._credentials.refresh(request)
+    #     return fetch_id_token(request, audience)
 
 
     def _ensure_access_token(
@@ -167,7 +167,7 @@ class VertexBase(BaseLLM):
 
         if hasattr( self._credentials, "id_token"):
             return self._credentials.id_token, project_id or self.project_id
-        return self._get_id_token(api_base), project_id or self.project_id
+        return self._credentials.token, project_id or self.project_id
 
     def is_using_v1beta1_features(self, optional_params: dict) -> bool:
         """
