@@ -91,7 +91,7 @@ class VertexBase(BaseLLM):
         else:
             creds, creds_project_id = google_auth.default(
                 quota_project_id=project_id,
-                scopes=["https://www.googleapis.com/auth/generative-language", "https://www.googleapis.com/auth/cloud-platform"],
+                scopes=["https://www.googleapis.com/auth/cloud-platform"],
             )
             if project_id is None:
                 project_id = creds_project_id or creds.quota_project_id
