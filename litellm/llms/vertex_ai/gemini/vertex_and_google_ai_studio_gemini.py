@@ -1276,6 +1276,9 @@ class VertexLLM(VertexBase):
             api_base=api_base,
             should_use_v1beta1_features=should_use_v1beta1_features,
         )
+
+        extra_headers['X-Goog-User-Project'] = vertex_project
+        
         headers = VertexGeminiConfig().validate_environment(
             api_key=auth_header,
             headers=extra_headers,
