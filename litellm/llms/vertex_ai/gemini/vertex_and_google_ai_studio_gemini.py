@@ -947,7 +947,7 @@ def make_sync_call(
             break
         except httpx.HTTPStatusError as e:
             retries -= 1
-            time.sleep(60)
+            time.sleep(120)
     if retries == 0:
         raise VertexAIError(status_code=500, message="retries exhausted")
     assert response is not None
