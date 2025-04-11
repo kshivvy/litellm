@@ -939,7 +939,7 @@ def make_sync_call(
     if client is None:
         client = HTTPHandler()  # Create a new client if none provided
 
-    retries = 25
+    retries = 100
     response = None
     while retries > 0:
         try:
