@@ -939,20 +939,7 @@ def make_sync_call(
     if client is None:
         client = HTTPHandler()  # Create a new client if none provided
 
-    retries = 100
-    response = None
-    while retries > 0:
-        try:
-            response = client.post(api_base, headers=headers, data=data, stream=True)
-            if response.status_code in (200, 201):
-                break
-        except httpx.HTTPStatusError as e:
-            pass
-        retries -= 1
-        time.sleep(120)
-    if retries == 0:
-        raise VertexAIError(status_code=500, message="retries exhausted")
-    assert response is not None
+    response = client.post(api_base, headers=headers, data=data, stream=True)
 
     if response.status_code != 200 and response.status_code != 201:
         raise VertexAIError(
