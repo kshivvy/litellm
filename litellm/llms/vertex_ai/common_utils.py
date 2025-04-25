@@ -1,5 +1,6 @@
 import re
 from typing import Dict, List, Literal, Optional, Tuple, Union
+import urllib.parse
 
 import httpx
 
@@ -118,49 +119,35 @@ def _get_gemini_url(
     gemini_api_key: Optional[str],
     api_base: Optional[str] = None,
 ) -> Tuple[str, str]:
-    _dynamic_model = None
-    if model.startswith("dynamic"):
-        _dynamic_model = model
-        # This can be anything.
-        _gemini_model_name = "models/gemini-1.5-flash-002"
-    else:
-        _gemini_model_name = "models/{}".format(model)
-    _api_base = api_base or "https://generativelanguage.googleapis.com"
+    if not model.startswith("dynamic/") and not model.startswith("models/"):
+        model = f"models/{model}"
+    api_base = api_base or "https://generativelanguage.googleapis.com"
+    # We will override model name in the query parameter, so the model name on path is not used.
+    model_for_path = "models/unused"
+    params = {"key": gemini_api_key, "model": model}
 
     if mode == "chat":
         endpoint = "generateContent"
         if stream is True:
             endpoint = "streamGenerateContent"
-            if _dynamic_model:
-                url = "{}/v1beta/{}:{}?key={}&model={}&alt=sse".format(
-                    _api_base, _gemini_model_name, endpoint, gemini_api_key, _dynamic_model
-                )
-            else:
-                url = "{}/v1beta/{}:{}?key={}&alt=sse".format(
-                    _api_base, _gemini_model_name, endpoint, gemini_api_key
-                )
-        else:
-
-            url = (
-                "{}/v1beta/{}:{}?key={}".format(
-                   _api_base, _gemini_model_name, endpoint, gemini_api_key
-                )
-            )
+            params["alt"] = "sse"
+        url = "{}/v1beta/{}:{}?{}".format(
+            api_base, model_for_path, endpoint, urllib.parse.urlencode(params)
+        )
     elif mode == "embedding":
         endpoint = "embedContent"
-        url = "{}/v1beta/{}:{}?key={}".format(
-            _api_base, _gemini_model_name, endpoint, gemini_api_key
+        url = "{}/v1beta/{}:{}?{}".format(
+            api_base, model_for_path, endpoint, urllib.parse.urlencode(params)
         )
     elif mode == "batch_embedding":
         endpoint = "batchEmbedContents"
-        url = "{}/v1beta/{}:{}?key={}".format(
-            _api_base, _gemini_model_name, endpoint, gemini_api_key
+        url = "{}/v1beta/{}:{}?{}".format(
+            api_base, model_for_path, endpoint, urllib.parse.urlencode(params)
         )
     elif mode == "image_generation":
         raise ValueError(
             "LiteLLM's `gemini/` route does not support image generation yet. Let us know if you need this feature by opening an issue at https://github.com/BerriAI/litellm/issues"
         )
-
     return url, endpoint
 
 
