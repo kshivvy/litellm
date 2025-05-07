@@ -4,6 +4,8 @@
 import json
 import uuid
 import time
+import re
+import os
 from copy import deepcopy
 from functools import partial
 from typing import (
@@ -965,6 +967,7 @@ def make_sync_call(
 
 class VertexLLM(VertexBase):
     def __init__(self) -> None:
+        self.litellm_completion_count = 0
         super().__init__()
 
     async def async_streaming(
@@ -1340,6 +1343,34 @@ class VertexLLM(VertexBase):
             client = HTTPHandler(**_params)  # type: ignore
         else:
             client = client
+
+        # Custom logging implementation
+        def redact_key_regex(url):
+            return re.sub(r"(?<=key=)[^&]+", "<redacted>", url)
+        # bucket_name = "openhands-scoring"
+        # object_name = "test_logs.json"
+
+        if logdir := os.getenv('LOG_DIR', None):
+            os.makedirs(os.path.join(logdir, 'litellm'), exist_ok=True)
+            logfile = os.path.join(
+                logdir, 'litellm', f'request_{self.litellm_completion_count}.json'
+            )
+            with open(logfile, 'w') as f:
+                f.write(json.dumps({
+                    "complete_input_dict": data,
+                    "api_base": redact_key_regex(url),
+                    "headers": {k: v for k, v in headers.items() if k != 'Authorization'},
+                }))
+            self.litellm_completion_count += 1
+        # client.post(
+        #     headers=headers,
+        #     url=f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={object_name}",
+        #     data=json.dumps({
+        #         "complete_input_dict": data,
+        #         "api_base": redact_key_regex(url),
+        #         "headers": {k: v for k, v in headers.items() if k != 'Authorization'},
+        #     }),
+        # )
 
         try:
             response = client.post(url=url, headers=headers, json=data)  # type: ignore
