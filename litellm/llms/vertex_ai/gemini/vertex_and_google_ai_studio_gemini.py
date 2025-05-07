@@ -1347,8 +1347,6 @@ class VertexLLM(VertexBase):
         # Custom logging implementation
         def redact_key_regex(url):
             return re.sub(r"(?<=key=)[^&]+", "<redacted>", url)
-        # bucket_name = "openhands-scoring"
-        # object_name = "test_logs.json"
 
         if logdir := os.getenv('LOG_DIR', None):
             os.makedirs(os.path.join(logdir, 'litellm'), exist_ok=True)
@@ -1362,16 +1360,6 @@ class VertexLLM(VertexBase):
                     "headers": {k: v for k, v in headers.items() if k != 'Authorization'},
                 }))
             self.litellm_completion_count += 1
-        # client.post(
-        #     headers=headers,
-        #     url=f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={object_name}",
-        #     data=json.dumps({
-        #         "complete_input_dict": data,
-        #         "api_base": redact_key_regex(url),
-        #         "headers": {k: v for k, v in headers.items() if k != 'Authorization'},
-        #     }),
-        # )
-
         try:
             response = client.post(url=url, headers=headers, json=data)  # type: ignore
             response.raise_for_status()
