@@ -4425,11 +4425,6 @@ def _get_model_info_helper(  # noqa: PLR0915
                 ):
                     _model_info = None
 
-            if _model_info is None or key is None:
-                raise ValueError(
-                    "This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json"
-                )
-
             _input_cost_per_token: Optional[float] = _model_info.get(
                 "input_cost_per_token"
             )
