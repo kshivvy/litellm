@@ -222,6 +222,8 @@ class VertexGeminiConfig(VertexAIBaseConfig, BaseConfig):
             return ToolConfig(functionCallingConfig=FunctionCallingConfig(mode="ANY"))
         elif tool_choice == "auto":
             return ToolConfig(functionCallingConfig=FunctionCallingConfig(mode="AUTO"))
+        elif tool_choice == "validated":
+            return ToolConfig(functionCallingConfig=FunctionCallingConfig(mode="VALIDATED"))
         elif isinstance(tool_choice, dict):
             # only supported for anthropic + mistral models - https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ToolChoice.html
             name = tool_choice.get("function", {}).get("name", "")
